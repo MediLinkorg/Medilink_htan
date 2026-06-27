@@ -1,8 +1,21 @@
 services:
   htan:
-    build: .
-    image: medilink-htan:latest
-    env_file: .env
+    image: ${DOCKERHUB_USERNAME}/medilink-htan:${IMAGE_TAG:-latest}
+    environment:
+      # Non-secrets — hardcoded
+      HTAN_HOST: "0.0.0.0"
+      HTAN_PORT: "8001"
+      HTAN_DEVICE: cuda
+      HTAN_DEFAULT_MODALITY: dermoscopy
+      HTAN_DEFAULT_TTA: basic
+      HTAN_PRELOAD_ALL: "false"
+      HTAN_MAX_UPLOAD_BYTES: "12582912"
+      HTAN_HF_REPO: mohamedkhaledmk7/HTAN
+      HTAN_W_DERMOSCOPY: htan_2_n2/best_model.pth
+      HTAN_W_HISTOLOGY: htan_1_n2_glas/best_model.pth
+      HTAN_W_MICROSCOPY: htan_1_n2_bowl/best_model.pth
+      # Secrets — injected at runtime from shell environment (set by GitHub Actions)
+      HF_TOKEN: ${HF_TOKEN}
     ports:
       - "8001:8001"
     volumes:
@@ -15,6 +28,12 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
     restart: unless-stopped
 
 volumes:
