@@ -5,7 +5,7 @@ services:
       # Non-secrets — hardcoded
       HTAN_HOST: "0.0.0.0"
       HTAN_PORT: "8001"
-      HTAN_DEVICE: cuda
+      HTAN_DEVICE: cpu
       HTAN_DEFAULT_MODALITY: dermoscopy
       HTAN_DEFAULT_TTA: basic
       HTAN_PRELOAD_ALL: "false"
@@ -21,13 +21,13 @@ services:
     volumes:
       - hf_cache:/cache/hf
       # - ./weights:/weights:ro   # uncomment if using HTAN_WEIGHTS_DIR=/weights
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
