@@ -1,0 +1,21 @@
+services:
+  htan:
+    build: .
+    image: medilink-htan:latest
+    env_file: .env
+    ports:
+      - "8001:8001"
+    volumes:
+      - hf_cache:/cache/hf
+      # - ./weights:/weights:ro   # uncomment if using HTAN_WEIGHTS_DIR=/weights
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  hf_cache:
